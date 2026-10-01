@@ -38,7 +38,6 @@ Headerless images; a 512-byte copier header is skipped automatically.
 | Hercules | 2 MB | 45874D3D | 2 | boot check |
 | Dragon Ball Z - Final Bout (dump, banks 07-0A blank) | 2 MB | 5BBA4EB3 | 2 | boot check, identical to its crack; sound partly missing |
 | Dragon Ball Z - Final Bout (sound restored, see below) | 2 MB | DD7AFCB9 | 2 | boot check |
-| Dragon Ball Z - Final Bout (old partial repair, superseded) | 2 MB | 51EEB811 | 2 | kept so an existing copy still loads |
 | Tekken 2 | 2 MB | 066687CA | 3 | boot check  |
 | Street Fighter EX Plus Alpha | 2 MB | DAD59B9F | 3 | boot check |
 | A Bug's Life | 2 MB | 014F0FCF | 4 | boot check |
