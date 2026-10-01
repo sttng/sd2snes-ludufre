@@ -1,7 +1,7 @@
 # sd2snes bootleg core (fpga_bootleg)
 
 Dedicated core for copy-protected unlicensed LoROM bootlegs: the games in fullsnes
-"SNES Cart Unlicensed Variants" (sttng/gb-stuff snes_bootleg.md) plus the ones nocash,
+"SNES Cart Unlicensed Variants" (https://problemkaputt.de/fullsnes.htm) plus the ones nocash,
 Revenant and others documented on nesdev (forum t=15510, 2017).  It is `sd2snes_base`
 plus `bootleg.v` and a small address remap in `main.v`; everything else (MSU-1, DMA,
 cheats, in-game hooks, SFX fetcher) is unchanged.
@@ -103,16 +103,6 @@ hardware.  An earlier partial repair built from SF EX (CRC 51EEB811) is supersed
 entry #60 was wrong and #61-#66 were missing.  Replace it with the restored image.
 
 ## Open issues
-- Digimon Adventure: the bitswap boot check passes and the title screen appears; after
-  Start the emulator shows a black screen with or without protection, so this is
-  probably not the protection.  Needs a hardware test.
-- Soul Blade: fights start, but graphics are corrupted in the emulator, also with C0-FF
-  mapped as ROM.  Hercules and DBZ use the same constant pattern and work, so the pattern
-  itself is unlikely to be the cause.  Needs a hardware test.
-- PORT6 (Bug's Life, Bananas) is a model that passes both games' checks, not the
-  documented chip function.
-- mk2: firmware size against the 128 KB flash and TS_CLK21 timing with the KOF98 remap
-  (one extra 2:1 mux on the ROM address path) are not checked.
 - No savestates on this core (it is not in savestate.c's core list).
 
 ## Corrections to the fullsnes list
