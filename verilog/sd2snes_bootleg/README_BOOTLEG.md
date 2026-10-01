@@ -98,11 +98,11 @@ copy ends at the bank boundary.  So the hole is SF II $060000-$07FFFF:
 
 It accepts the 2 MB dump or the 4 MB overdump and refuses any other input.  The result is
 still the protected cart (the core provides the protection) and runs with full sound on
-hardware.  An earlier partial repair built from SF EX (CRC 51EEB811) is superseded: its
-entry #60 was wrong and #61-#66 were missing.  Replace it with the restored image.
+hardware. 
 
 ## Open issues
 - No savestates on this core (it is not in savestate.c's core list).
+- tbd
 
 ## Corrections to the fullsnes list
 Per nocash (nesdev t=15510, 2017) and confirmed by tracing: A Bug's Life and Bananas de
