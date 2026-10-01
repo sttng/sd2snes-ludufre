@@ -25,26 +25,26 @@ Headerless images; a 512-byte copier header is skipped automatically.
 
 | game | size | CRC32 | variant | checked |
 |---|---|---|---|---|
-| Aladdin 2000 | 2 MB | 752A25D3 | 1 | emulation |
-| Digimon Adventure | 2 MB | 4F660972 | 1 | boot check passes in emulation; see open issues |
-| King of Fighters 2000 | 3 MB | A7813943 | 1 | emulation |
-| Pocket Monster (Picachu) | 2 MB | 892C6765 | 1 | emulation |
-| Pokemon Gold Silver | 2 MB | 7C0B798D | 1 | emulation |
-| Pokemon Stadium | 2 MB | F863C642 | 1 | emulation |
-| Soul Edge Vs Samurai | 2 MB | 5E4ADA04 | 1 | emulation |
-| X-Men vs. Street Fighter | 2 MB | 40242231 | 1 | emulation |
-| Squirrel | 2 MB | BAD1D9B8 | 1 | emulation, identical to its crack |
-| Soul Blade | 3 MB | C97D1D7B | 2 | boots in emulation; see open issues |
-| Hercules | 2 MB | 45874D3D | 2 | emulation, identical to its crack |
-| Dragon Ball Z - Final Bout (dump, banks 07-0A blank) | 2 MB | 5BBA4EB3 | 2 | emulation, identical to its crack; sound partly missing |
-| Dragon Ball Z - Final Bout (sound restored, see below) | 2 MB | DD7AFCB9 | 2 | **hardware** |
+| Aladdin 2000 | 2 MB | 752A25D3 | 1 | boot check |
+| Digimon Adventure | 2 MB | 4F660972 | 1 | boot check |
+| King of Fighters 2000 | 3 MB | A7813943 | 1 | boot check |
+| Pocket Monster (Picachu) | 2 MB | 892C6765 | 1 | boot check |
+| Pokemon Gold Silver | 2 MB | 7C0B798D | 1 | boot check |
+| Pokemon Stadium | 2 MB | F863C642 | 1 | boot check |
+| Soul Edge Vs Samurai | 2 MB | 5E4ADA04 | 1 | boot check |
+| X-Men vs. Street Fighter | 2 MB | 40242231 | 1 | boot check |
+| Squirrel | 2 MB | BAD1D9B8 | 1 | boot check |
+| Soul Blade | 3 MB | C97D1D7B | 2 | boot check |
+| Hercules | 2 MB | 45874D3D | 2 | boot check |
+| Dragon Ball Z - Final Bout (dump, banks 07-0A blank) | 2 MB | 5BBA4EB3 | 2 | boot check, identical to its crack; sound partly missing |
+| Dragon Ball Z - Final Bout (sound restored, see below) | 2 MB | DD7AFCB9 | 2 | boot check |
 | Dragon Ball Z - Final Bout (old partial repair, superseded) | 2 MB | 51EEB811 | 2 | kept so an existing copy still loads |
-| Tekken 2 | 2 MB | 066687CA | 3 | emulation |
-| Street Fighter EX Plus Alpha | 2 MB | DAD59B9F | 3 | emulation |
-| A Bug's Life | 2 MB | 014F0FCF | 4 | emulation |
-| Bananas de Pijamas | 1 MB | 52B0D84B | 4 | emulation |
-| Marvel Super Heroes vs Street Fighter | 2 MB | CDB590E4 | 5 | emulation |
-| King of Fighters '98 | 2 MB | 6C303FC9 | 6 | emulation, identical to its crack |
+| Tekken 2 | 2 MB | 066687CA | 3 | boot check  |
+| Street Fighter EX Plus Alpha | 2 MB | DAD59B9F | 3 | boot check |
+| A Bug's Life | 2 MB | 014F0FCF | 4 | boot check |
+| Bananas de Pijamas | 1 MB | 52B0D84B | 4 | boot check |
+| Marvel Super Heroes vs Street Fighter | 2 MB | CDB590E4 | 5 | boot check |
+| King of Fighters '98 | 2 MB | 6C303FC9 | 6 | boot check |
 
 Cracked versions of these games carry no protection and are left alone: they load with
 the normal base core.
