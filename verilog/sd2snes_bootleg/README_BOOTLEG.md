@@ -51,15 +51,7 @@ the normal base core.
 ## Layout
 - `verilog/sd2snes_bootleg/` – the core.  Put it next to `sd2snes_base`; `CORE = bootleg`
   builds `fpga_bootleg.bit` (mk2) / `fpga_bootleg.bi3` (mk3); copy those to `/sd2snes/`.
-- `src/` – changed firmware files (full copies).  `patches/firmware.diff` is the same change
-  as a patch against the original tree (`patch -p1`), verified to apply cleanly.
-- `patches/core_vs_base.diff` – what differs from `sd2snes_base` (review aid).
-- `sim/tb_bootleg.v` – self-checking testbench for all six variants
-  (`iverilog -g2012 sim/tb_bootleg.v verilog/sd2snes_bootleg/bootleg.v && vvp a.out`).
-- `sim/tb_kof98_remap.v` – runs the KOF98 address remap from `main.v` through the real
-  `address.v` (`iverilog -g2012 sim/tb_kof98_remap.v verilog/sd2snes_bootleg/address.v`).
-- `sim/lakesnes/` – emulator trace harness used to verify the protection models
-  (see its README.txt).
+- `src/` – changed firmware files (full copies). 
 - `src/utils/bootleg_fp.py` – prints table rows (CRC + 64 KB fingerprint) for ROM files;
   `--fix OUTDIR` converts doubled-bank overdumps to the clean image.
 - `src/utils/repair_dbz_sound.py` – restores Dragon Ball Z - Final Bout's missing sound banks.
