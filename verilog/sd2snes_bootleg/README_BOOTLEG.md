@@ -1,7 +1,6 @@
 # sd2snes bootleg core (fpga_bootleg)
 
-Dedicated core for the copy-protected unlicensed LoROM bootlegs listed in
-fullsnes "SNES Cart Unlicensed Variants" (sttng/gb-stuff snes_bootleg.md).
+Dedicated core for the copy-protected unlicensed LoROM bootlegs.
 It is `sd2snes_base` plus `bootleg.v`; everything else (MSU-1, DMA, cheats,
 in-game hooks, SFX fetcher) is unchanged.
 
