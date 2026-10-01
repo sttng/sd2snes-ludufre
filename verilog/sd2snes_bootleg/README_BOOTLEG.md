@@ -1,80 +1,122 @@
 # sd2snes bootleg core (fpga_bootleg)
 
-Dedicated core for the copy-protected unlicensed LoROM bootlegs.
-It is `sd2snes_base` plus `bootleg.v`; everything else (MSU-1, DMA, cheats,
-in-game hooks, SFX fetcher) is unchanged.
+Dedicated core for copy-protected unlicensed LoROM bootlegs: the games in fullsnes
+"SNES Cart Unlicensed Variants" (sttng/gb-stuff snes_bootleg.md) plus the ones nocash,
+Revenant and others documented on nesdev (forum t=15510, 2017).  It is `sd2snes_base`
+plus `bootleg.v` and a small address remap in `main.v`; everything else (MSU-1, DMA,
+cheats, in-game hooks, SFX fetcher) is unchanged.
 
-| variant (chipfeat[2:0]) | games | hardware |
+## Protection variants
+
+The firmware picks the variant from the ROM's CRC32 and sends it as chipfeat[2:0].
+
+| variant | games | hardware |
 |---|---|---|
-| 1 BITSWAP  | Aladdin 2000, Digimon Adventure, KOF2000, Pocket Monster, Pokemon Gold Silver, Pokemon Stadium, Soul Edge Vs Samurai, X-Men vs SF, Squirrel | latch in banks A23=1/A18-16=000 (80,88,...), read = bits 0,6,7,1,2,3,4,5 |
-| 2 CONSTANT | Soul Blade, Hercules, Dragon Ball Z Final Bout | 80-BF:8000-FFFF = 55,0F,AA,F0; C0-FF open bus |
-| 3 ALU      | Tekken 2, SF EX Plus Alpha | 80-BF:8000-87FF set/clear/count/shift unit, result at 81xx |
-| 4 PORT6    | A Bug's Life, Bananas de Pijamas (both verified in emulation) | 00-3F/80-BF:6000-6FFF; function undocumented, core returns one answer set that passes both games' checks (61=2 while 60xx armed, 63=4, 65=F, 67=0, 6F=3) |
-| 5 BITSWAP40 | Marvel Super Heroes vs Street Fighter (verified in emulation) | same latch and bit order as BITSWAP, decoded at 40-4F:8000-FFFF (game writes 4x:xxx2, reads 4x:xxx0) |
-| 6 KOF98     | King of Fighters '98 (verified in emulation) | BITSWAP as type 1, plus a bank register at C0-CF:8000-FFFF (game: C0:8788 = 82/00); while bit 7 is set, ROM accesses see A19..A16 replaced by its low nibble. Remap applied in main.v before address.v |
+| 1 BITSWAP   | Aladdin 2000, Digimon Adventure, KOF2000, Pocket Monster (Picachu), Pokemon Gold Silver, Pokemon Stadium, Soul Edge Vs Samurai, X-Men vs SF, Squirrel | write latch at 88:xxxx, read back at 80:xxxx with bits reordered 0,6,7,1,2,3,4,5; decoded in banks A23=1 / A18-16=000 (80, 88, 90 ...) |
+| 2 CONSTANT  | Soul Blade, Hercules, Dragon Ball Z - Final Bout | 80-BF:8000-FFFF read as the repeating pattern 55,0F,AA,F0; C0-FF open bus |
+| 3 ALU       | Tekken 2, Street Fighter EX Plus Alpha | 80-BF:8000-87FF: set/clear/count/shift unit, result read at 81xx |
+| 4 PORT6     | A Bug's Life, Bananas de Pijamas | 00-3F/80-BF:6000-6FFF; real function undocumented, the core returns one answer set that passes both games' checks (61=2 while 60xx armed, 63=4, 65=F, 67=0, 6F=3) |
+| 5 BITSWAP40 | Marvel Super Heroes vs Street Fighter | BITSWAP latch and bit order, decoded at 40-4F:8000-FFFF (game writes 4x:xxx2, reads 4x:xxx0) |
+| 6 KOF98     | King of Fighters '98 | BITSWAP, plus a bank register at C0-CF:8000-FFFF (game: C0:8788 = 82/00); while bit 7 is set, ROM accesses see A19..A16 replaced by its low nibble (remap in main.v, before address.v) |
+
+## Supported files
+
+Headerless images; a 512-byte copier header is skipped automatically.
+
+| game | size | CRC32 | variant | checked |
+|---|---|---|---|---|
+| Aladdin 2000 | 2 MB | 752A25D3 | 1 | emulation |
+| Digimon Adventure | 2 MB | 4F660972 | 1 | boot check passes in emulation; see open issues |
+| King of Fighters 2000 | 3 MB | A7813943 | 1 | emulation |
+| Pocket Monster (Picachu) | 2 MB | 892C6765 | 1 | emulation |
+| Pokemon Gold Silver | 2 MB | 7C0B798D | 1 | emulation |
+| Pokemon Stadium | 2 MB | F863C642 | 1 | emulation |
+| Soul Edge Vs Samurai | 2 MB | 5E4ADA04 | 1 | emulation |
+| X-Men vs. Street Fighter | 2 MB | 40242231 | 1 | emulation |
+| Squirrel | 2 MB | BAD1D9B8 | 1 | emulation, identical to its crack |
+| Soul Blade | 3 MB | C97D1D7B | 2 | boots in emulation; see open issues |
+| Hercules | 2 MB | 45874D3D | 2 | emulation, identical to its crack |
+| Dragon Ball Z - Final Bout (dump, banks 07-0A blank) | 2 MB | 5BBA4EB3 | 2 | emulation, identical to its crack; sound partly missing |
+| Dragon Ball Z - Final Bout (sound restored, see below) | 2 MB | DD7AFCB9 | 2 | **hardware** |
+| Dragon Ball Z - Final Bout (old partial repair, superseded) | 2 MB | 51EEB811 | 2 | kept so an existing copy still loads |
+| Tekken 2 | 2 MB | 066687CA | 3 | emulation |
+| Street Fighter EX Plus Alpha | 2 MB | DAD59B9F | 3 | emulation |
+| A Bug's Life | 2 MB | 014F0FCF | 4 | emulation |
+| Bananas de Pijamas | 1 MB | 52B0D84B | 4 | emulation |
+| Marvel Super Heroes vs Street Fighter | 2 MB | CDB590E4 | 5 | emulation |
+| King of Fighters '98 | 2 MB | 6C303FC9 | 6 | emulation, identical to its crack |
+
+Cracked versions of these games carry no protection and are left alone: they load with
+the normal base core.
 
 ## Layout
-- `verilog/sd2snes_bootleg/` – the core (drop next to `sd2snes_base`, `CORE = bootleg`
-  -> `fpga_bootleg.bit` / `fpga_bootleg.bi3`, copy to `/sd2snes/` on the SD card).
-- `src/` – changed firmware files (full copies). `patches/firmware.diff` is the same
-  change as a patch against the uploaded tree (`patch -p1`), verified to apply cleanly.
+- `verilog/sd2snes_bootleg/` – the core.  Put it next to `sd2snes_base`; `CORE = bootleg`
+  builds `fpga_bootleg.bit` (mk2) / `fpga_bootleg.bi3` (mk3); copy those to `/sd2snes/`.
+- `src/` – changed firmware files (full copies).  `patches/firmware.diff` is the same change
+  as a patch against the original tree (`patch -p1`), verified to apply cleanly.
 - `patches/core_vs_base.diff` – what differs from `sd2snes_base` (review aid).
-- `sim/tb_bootleg.v` – self-checking testbench vs. a MAME-derived model
+- `sim/tb_bootleg.v` – self-checking testbench for all six variants
   (`iverilog -g2012 sim/tb_bootleg.v verilog/sd2snes_bootleg/bootleg.v && vvp a.out`).
-- `src/utils/bootleg_fp.py` – prints table rows with the 64 KB fingerprint filled in.
+- `sim/tb_kof98_remap.v` – runs the KOF98 address remap from `main.v` through the real
+  `address.v` (`iverilog -g2012 sim/tb_kof98_remap.v verilog/sd2snes_bootleg/address.v`).
+- `sim/lakesnes/` – emulator trace harness used to verify the protection models
+  (see its README.txt).
+- `src/utils/bootleg_fp.py` – prints table rows (CRC + 64 KB fingerprint) for ROM files;
+  `--fix OUTDIR` converts doubled-bank overdumps to the clean image.
+- `src/utils/repair_dbz_sound.py` – restores Dragon Ball Z - Final Bout's missing sound banks.
 
 ## How a game gets here
 `load_identify()` enables `bootleg_scan` for normal SNES game loads; `smc_id()` then
-CRC32s the headerless image only if its size is 1, 2 or 3 MB. A match sets
-`fpga_conf = FPGA_BOOTLEG`, `mapper_id = 1`, `fpga_dspfeat = variant`, clears any
-chip the copied header claimed, and sizes the ROM from the file. `fpga_dspfeat`
-already goes to the FPGA as CMD 0xEF; the new core's `mcu_cmd.v` decodes it.
-
-## Known limits
-- All 64 KB fingerprints are filled in: other 1/2/3 MB games cost one 64 KB read.
-- Not run on hardware yet. mk2 firmware size not checked (tight 128 KB flash).
-- No savestates on this core (not in savestate.c's core list).
-
-## Corrections vs. the fullsnes list
-Per nocash (nesdev forum t=15510, 2017): A Bug's Life and Bananas de Pijamas use a
-"port 6xxx" protection (their bitswap code is dead), and SF EX Plus Alpha uses the
-Tekken 2 ALU. A Bug's Life was traced in an emulator: with bitswap it hits BRK at
-01:85C5 on frame 19; with PORT6 it boots and plays (8000 frames, no further port reads
-apart from stray pointer reads at A1:61C0, which the core leaves alone).
+checks the headerless image only if its size is 1, 2 or 3 MB.  The CRC32 of the first
+64 KB is compared first; only on a fingerprint hit is the full image CRC'd, so other games
+of those sizes cost a single 64 KB read.  A match sets `fpga_conf = FPGA_BOOTLEG`,
+`mapper_id = 1`, `fpga_dspfeat = variant`, clears any chip the copied header claimed and
+sizes the ROM from the file.  `fpga_dspfeat` goes to the FPGA as CMD 0xEF; the core's
+`mcu_cmd.v` decodes it as chipfeat.
 
 ## Overdumps
-Some circulating Picachu, Pokemon Stadium, Tekken 2 (8 MB) and DBZ Final Bout (4 MB) files are overdumps: every 32 KB
-bank stored twice, mirrored to 8 MB. They are not recognised; convert them with
+Some circulating files are overdumps with every 32 KB bank stored twice: Picachu, Pokemon
+Stadium and Tekken 2 (8 MB, the doubled image mirrored once more) and Dragon Ball Z -
+Final Bout (4 MB).  They are not recognised as they are; convert them with
   python3 src/utils/bootleg_fp.py --fix OUTDIR *.sfc
-which writes the clean 2 MB images (their CRCs then match the table).
+which writes the clean images, whose CRCs match the table.
 
-## Emulator check (sim/lakesnes)
-Boot + ~6000 frames with the core models: Aladdin 2000, KOF2000, Picachu, Pokemon G&S,
-Pokemon Stadium, X-Men vs SF, Soul Edge vs Samurai, Squirrel, Marvel vs SF, KOF98, Hercules, DBZ Final Bout, Tekken 2, SF EX Plus Alpha (ALU; black screen with
-bitswap), Bug's Life, Bananas all reach gameplay/character select.
-Unclear in the emulator: Digimon (bitswap boot check passes, title screen OK, black
-after Start with or without protection) and Soul Blade (fights start, graphics
-corrupted; also with C0-FF mapped as ROM). Need hardware tests.
-Hercules uses the same constant pattern and matches its crack frame-for-frame for 9000
-frames, so Soul Blade's corruption is unlikely to come from the pattern itself.
-
-## Dragon Ball Z - Final Bout: incomplete dump (audio only) and full restoration
-The known dump (CRC 5BBA4EB3) has four blank 32 KB banks, ROM $038000-$057FFF.  They are
-sound data only: the upload table at $05:8000 (76 entries) points into them from entry #32
-on.  A blank entry is a valid empty upload, so the game runs but goes silent (e.g. from
-character select on).  Nothing else references the hole (the protection reads at banks
-$87-$8A overlap its offsets but return the pattern on the real cart).
+## Dragon Ball Z - Final Bout: restoring the missing sound
+Every circulating DBZ Final Bout file (the 2 MB dump, the 4 MB overdump and the cracks)
+comes from one dump (CRC 5BBA4EB3) with four blank 32 KB banks, ROM $038000-$057FFF.  They
+hold sound data only: the upload table at $05:8000 (76 entries) points into them from entry
+#32 on.  A blank entry is a valid empty upload, so the dump runs but goes silent (e.g. from
+character select on).  Nothing else references the hole; the protection reads at banks
+$87-$8A overlap its ROM offsets, but return the pattern on the real cart.
 
 Source of the data: DVS copied Street Fighter II (Japan) (CRC 5556C5C9) ROM banks $0A-$0F
 verbatim into DBZ banks $05-$0A and rebased the table by -5 banks.  Verified: DBZ's intact
 65,308 bytes equal SF II at +$28000, the table matches with every bank byte -5, all 76
-entries are valid chains in SF II ending exactly on DBZ's table boundaries, and the copy
-ends at the bank boundary.  So the hole is SF II $060000-$07FFFF:
+entries are valid upload chains in SF II ending exactly on DBZ's table boundaries, and the
+copy ends at the bank boundary.  So the hole is SF II $060000-$07FFFF:
 
   python3 src/utils/repair_dbz_sound.py DBZ_DUMP SF2_DUMP DBZ_restored.sfc   -> CRC DD7AFCB9
 
-(Accepts the 2 MB dump or the 4 MB doubled overdump; refuses any other input.)
-Emulation: identical video, no hang, music where the original is silent.  The image is still
-the protected cart (the bootleg core provides the protection); both CRCs are in the table.
-An earlier partial repair built from SF EX (CRC 51EEB811) is superseded: its entry #60 was
-wrong and #61-#66 were missing.  It is still recognised so an existing copy keeps loading.
+It accepts the 2 MB dump or the 4 MB overdump and refuses any other input.  The result is
+still the protected cart (the core provides the protection) and runs with full sound on
+hardware.  An earlier partial repair built from SF EX (CRC 51EEB811) is superseded: its
+entry #60 was wrong and #61-#66 were missing.  Replace it with the restored image.
+
+## Open issues
+- Digimon Adventure: the bitswap boot check passes and the title screen appears; after
+  Start the emulator shows a black screen with or without protection, so this is
+  probably not the protection.  Needs a hardware test.
+- Soul Blade: fights start, but graphics are corrupted in the emulator, also with C0-FF
+  mapped as ROM.  Hercules and DBZ use the same constant pattern and work, so the pattern
+  itself is unlikely to be the cause.  Needs a hardware test.
+- PORT6 (Bug's Life, Bananas) is a model that passes both games' checks, not the
+  documented chip function.
+- mk2: firmware size against the 128 KB flash and TS_CLK21 timing with the KOF98 remap
+  (one extra 2:1 mux on the ROM address path) are not checked.
+- No savestates on this core (it is not in savestate.c's core list).
+
+## Corrections to the fullsnes list
+Per nocash (nesdev t=15510, 2017) and confirmed by tracing: A Bug's Life and Bananas de
+Pijamas use a "port 6xxx" protection (their bitswap code is dead), and SF EX Plus Alpha uses
+the Tekken 2 ALU, not bitswap.  Squirrel, Marvel vs SF, KOF98, Hercules and DBZ Final Bout
+were added from the same thread, each checked against its crack.
